@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <!-- Basic Page Needs
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta charset="utf-8">
+    <title>Anthony Vardaro</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Mobile Specific Metas
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css" rel="stylesheet" type="text/css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" rel="stylesheet" type="text/css">
+    <link href="./main.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="row" style="margin-top: 25%">
+            <div class="six columns">
+                <input type="text" id="numBuses" placeholder="Number of buses">
+
+            </div>
+            <div class="six columns">
+
+
+                <input type="text" id="address" placeholder="1001 UTA BLVD">
+                <input type="button" value="Add" id="add">
+                
+            </div>
+
+
+        </div>
+        <div class="row">
+            <div class="five columns">
+                <div id="locations">
+                    None
+                </div>
+                <input type="button" value="Submit" id="submit">
+            </div>
+        </div>
+
+
+    </div>
+
+    <script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3&amp;libraries=places"></script>
+    <script type="text/javascript" src="./main.js"></script>
+
+</body>

@@ -15,6 +15,7 @@ app.use(express.static(`client`));
 app.post('/api/midpoint', (req, res) => {
     let numBuses = req.body.buses;
     let locations = req.body.locations;
+    res.send(req.body);
 });
 
 app.get('/', (req, res) => {
