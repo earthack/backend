@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = {
+const clusterMaker = {
 
   data: getterSetter([], function(arrayOfArrays) {
     var n = arrayOfArrays[0].length;

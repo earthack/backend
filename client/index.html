@@ -21,39 +21,49 @@
 
 </head>
 
-<body>
-    
-    <div class="container">
-        <div class="row" style="margin-top: 25%">
-            <div class="six columns">
-                <input type="text" id="numBuses" placeholder="Number of buses">
+<body style="overflow: hidden">
+
+
+    <div class="row">
+
+        <div class="four columns" style="padding-left: 10rem;padding-top: 15rem;">
+            <h1>Rendezvous</h1>
+            <label for="eventLocation">Location of event</label>
+            <input style="width: 95%" type="text" id="eventLocation">
+
+            <label for="eventLocation">Number of buses</label>
+            <input style="width: 95%" type="text" id="numBuses">
+
+            <label for="eventLocation">Participant addresses</label>
+            <input style="width: 95%" type="text" id="address">
+            <!-- <input class="button-primary" type="button" value="Add" id="add"> -->
+            <div id="locations">
 
             </div>
-            <div class="six columns">
+            <input class="button-primary" type="button" value="Submit" id="submit">
+        </div>
 
-                <input type="text" id="address" placeholder="Your address">
-                <input class="button-primary"type="button" value="Add" id="add">
-                
+        <div class="eight columns">
+            <div style="height: 100vh;" id="map">
+
             </div>
 
 
         </div>
-        <div class="row">
-            <div class="five columns">
-                <div id="locations">
-                    Addresses
-                </div>
-                <input class="button-primary" type="button" value="Submit" id="submit">
-            </div>
-        </div>  
 
 
     </div>
+
+    <div class="row" style="margin-bottom: 25%">
+
+    </div>
+
 
     <script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
         crossorigin="anonymous"></script>
     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3&amp;libraries=places"></script>
     <script type="text/javascript" src="./kmeans.js"></script>
+
     <script type="text/javascript" src="./main.js"></script>
 
 </body>

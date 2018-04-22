@@ -1,23 +1,67 @@
 $(document).ready(() => {
     let addressArray = [];
+    let eventLocation;
     let buses = 0;
-    console.log(google);
+    let clusters = [];
     const geocoder = new google.maps.Geocoder;
-        
-    //number of clusters, defaults to undefined
-    clusterMaker.k(3);
-    
-    //number of iterations (higher number gives more time to converge), defaults to 1000
-    clusterMaker.iterations(750);
-    
-    //data from which to identify clusters, defaults to []
-    clusterMaker.data([[1, 0], [0, 1], [0, 0], [-10, 10], [-9, 11], [10, 10], [11, 12]]);
-    
-    console.log(clusterMaker.clusters());
+    let infowindow = new google.maps.InfoWindow({});
 
-    $("#add").click(e => {
+    var latlng = new google.maps.LatLng(31.526446, -99.3420866);
+    let map = new google.maps.Map(document.getElementById('map'), {
+        center: latlng,
+        zoom: 6
+    });
+
+    $(document).keypress(function (e) {
+        if (e.which == 13) {
+            handleAdd();
+        }
+    });
+
+    $("#add").click(handleAdd);
+    $('#eventLocation').change(e => {
+        eventLocation = $('#eventLocation').val();
+
+        geocoder.geocode({
+            'address': eventLocation
+        }, (res, status) => {
+
+            $('#eventLocation').val(res[0].formatted_address);
+            let marker = new google.maps.Marker({
+                position: res[0].geometry.location,
+                icon: 'darkgreen_MarkerE.png',
+                map: map
+            });
+            let currentBounds = map.getBounds();
+            let markerPos = marker.getPosition();
+    
+            // adjust the viewport
+            if (!currentBounds.contains(markerPos)) {
+                let newBounds = currentBounds.extend(markerPos);
+                map.fitBounds(newBounds);
+            }
+    
+            google.maps.event.addListener(marker, 'click', ((marker) => {
+                return () => {
+                    infowindow.setContent("Event location")
+                    infowindow.open(map, marker);
+                }
+            })(marker));
+        });
+
+    });
+    $('#submit').click(() => {
+        buses = $('#numBuses').val();
+
+        // let a = calcMidpoint();
+        clusters = getClusters();
+        console.log(clusters);
+        markOnMap();
+    });
+
+    function handleAdd(e) {
         let curInput = $('#address').val().trim();
-        
+
         if (curInput.length == 0) {
             alert('enter address');
             return;
@@ -32,18 +76,32 @@ $(document).ready(() => {
                 addressArray.push(res[0]);
                 $('#address').val('')
                 rebuildBox();
+
+                let marker = new google.maps.Marker({
+                    position: res[0].geometry.location,
+                    icon: 'paleblue_MarkerP.png',
+                    map: map
+                });
+                let currentBounds = map.getBounds();
+                let markerPos = marker.getPosition();
+    
+                // adjust the viewport
+                if (!currentBounds.contains(markerPos)) {
+                    let newBounds = currentBounds.extend(markerPos);
+                    map.fitBounds(newBounds);
+                }
+    
+                google.maps.event.addListener(marker, 'click', ((marker) => {
+                    return () => {
+                        infowindow.setContent(res[0].formatted_address)
+                        infowindow.open(map, marker);
+                    }
+                })(marker));
             }
         });
-    });
-
-    $('#submit').click(() => {
-        buses = $('#numBuses').val();
-
-        let a = calcMidpoint();
-    });
+    }
     function rebuildBox() {
         let len = addressArray.length;
-        console.log(addressArray);
         let str = ``;
         for (let i = 0; i < len; i++) {
             let cur = addressArray[i];
@@ -53,54 +111,45 @@ $(document).ready(() => {
         $('#locations').html(str);
     }
 
-    function calcMidpoint() {
-        let midLat = 0;
-        let midLong = 0;
-    
-        let x = 0;
-        let y = 0;
-        let z = 0;
-    
-        // temp lat long for loop
-        let tempLat, tempLong;
-        // temp cartesian coordinates
-        let tempX, tempY, tempZ;
-    
-        for (let i = 0; i < addressArray.length; i++) {
-            let curLocation = addressArray[i];
-            tempLat = curLocation.geometry.location.lat() * (Math.PI/180);
-            tempLong = curLocation.geometry.location.lng() * (Math.PI/180);
+    function getClusters() {
+        let len = addressArray.length;
 
-            tempX = Math.cos(tempLat) * Math.cos(tempLong);
-            tempY = Math.cos(tempLat) * Math.sin(tempLong);
-            tempZ = Math.sin(tempLat);
-
-            x += tempX;
-            y += tempY;
-            z += tempZ;
+        let coordinates = [];
+        for (let i = 0; i < len; i++) {
+            let cur = addressArray[i];
+            let out = [cur.geometry.location.lat(), cur.geometry.location.lng()];
+            coordinates.push(out);
         }
+        //number of clusters, defaults to undefined
+        clusterMaker.k(buses);
 
-        x = x/addressArray.length;
-        y = y/addressArray.length;
-        z = z/addressArray.length;
-        midLong = Math.atan2(y,x);
-        let hypotenuse = Math.sqrt(x * x + y * y);
-        midLat = Math.atan2(z, hypotenuse);
+        //number of iterations (higher number gives more time to converge), defaults to 1000
+        clusterMaker.iterations(750);
 
-        midLat = toDegFromRad(midLat);
-        midLong = toDegFromRad(midLong);
-        console.log(midLat);
-        console.log(midLong);
-        // now we have the coordinates of the midpoint!
-        let point = new google.maps.LatLng(midLat, midLong);
-        console.log(point.toJSON());
+        //data from which to identify clusters, defaults to []
+        clusterMaker.data(coordinates);
 
-    }
-    function toDegFromRad(rd) {
-        return (rd * 180/Math.PI);
+        return clusterMaker.clusters();
     }
 
-    function initMap() {
+    function markOnMap() {
 
+        // now plot the bus stops
+        for (let i = 0; i < clusters.length; i++) {
+            let cur = clusters[i];
+            marker = new google.maps.Marker({
+                position: new google.maps.LatLng(cur.centroid[0], cur.centroid[1]),
+                icon: 'purple_MarkerB.png',
+                setLabel: "Bus stop",
+                map: map
+            });
+
+            google.maps.event.addListener(marker, 'click', ((marker, i) => {
+                return () => {
+                    infowindow.setContent("Bus stop")
+                    infowindow.open(map, marker);
+                }
+            })(marker, i));
+        }
     }
 });
