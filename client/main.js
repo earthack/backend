@@ -1,15 +1,208 @@
 $(document).ready(() => {
     let addressArray = [];
+
+    let clusterMarkers = [];
+
     let eventLocation;
     let buses = 0;
     let clusters = [];
     const geocoder = new google.maps.Geocoder;
     let infowindow = new google.maps.InfoWindow({});
-
+    for (let i = 0; i < STRING_ARRAY.length; i++) {
+        console.log(STRING_ARRAY[i]);
+        $('#address').val(STRING_ARRAY[i].trim());
+        handleAdd();
+    }
     var latlng = new google.maps.LatLng(31.526446, -99.3420866);
     let map = new google.maps.Map(document.getElementById('map'), {
         center: latlng,
-        zoom: 6
+        zoom: 6,
+        styles: [
+            {
+                "elementType": "geometry",
+                "stylers": [
+                    {
+                        "color": "#212121"
+                    }
+                ]
+            },
+            {
+                "elementType": "labels.icon",
+                "stylers": [
+                    {
+                        "visibility": "off"
+                    }
+                ]
+            },
+            {
+                "elementType": "labels.text.fill",
+                "stylers": [
+                    {
+                        "color": "#757575"
+                    }
+                ]
+            },
+            {
+                "elementType": "labels.text.stroke",
+                "stylers": [
+                    {
+                        "color": "#212121"
+                    }
+                ]
+            },
+            {
+                "featureType": "administrative",
+                "elementType": "geometry",
+                "stylers": [
+                    {
+                        "color": "#757575"
+                    }
+                ]
+            },
+            {
+                "featureType": "administrative.country",
+                "elementType": "labels.text.fill",
+                "stylers": [
+                    {
+                        "color": "#9e9e9e"
+                    }
+                ]
+            },
+            {
+                "featureType": "administrative.land_parcel",
+                "stylers": [
+                    {
+                        "visibility": "off"
+                    }
+                ]
+            },
+            {
+                "featureType": "administrative.locality",
+                "elementType": "labels.text.fill",
+                "stylers": [
+                    {
+                        "color": "#bdbdbd"
+                    }
+                ]
+            },
+            {
+                "featureType": "poi",
+                "elementType": "labels.text.fill",
+                "stylers": [
+                    {
+                        "color": "#757575"
+                    }
+                ]
+            },
+            {
+                "featureType": "poi.park",
+                "elementType": "geometry",
+                "stylers": [
+                    {
+                        "color": "#181818"
+                    }
+                ]
+            },
+            {
+                "featureType": "poi.park",
+                "elementType": "labels.text.fill",
+                "stylers": [
+                    {
+                        "color": "#616161"
+                    }
+                ]
+            },
+            {
+                "featureType": "poi.park",
+                "elementType": "labels.text.stroke",
+                "stylers": [
+                    {
+                        "color": "#1b1b1b"
+                    }
+                ]
+            },
+            {
+                "featureType": "road",
+                "elementType": "geometry.fill",
+                "stylers": [
+                    {
+                        "color": "#2c2c2c"
+                    }
+                ]
+            },
+            {
+                "featureType": "road",
+                "elementType": "labels.text.fill",
+                "stylers": [
+                    {
+                        "color": "#8a8a8a"
+                    }
+                ]
+            },
+            {
+                "featureType": "road.arterial",
+                "elementType": "geometry",
+                "stylers": [
+                    {
+                        "color": "#373737"
+                    }
+                ]
+            },
+            {
+                "featureType": "road.highway",
+                "elementType": "geometry",
+                "stylers": [
+                    {
+                        "color": "#3c3c3c"
+                    }
+                ]
+            },
+            {
+                "featureType": "road.highway.controlled_access",
+                "elementType": "geometry",
+                "stylers": [
+                    {
+                        "color": "#4e4e4e"
+                    }
+                ]
+            },
+            {
+                "featureType": "road.local",
+                "elementType": "labels.text.fill",
+                "stylers": [
+                    {
+                        "color": "#616161"
+                    }
+                ]
+            },
+            {
+                "featureType": "transit",
+                "elementType": "labels.text.fill",
+                "stylers": [
+                    {
+                        "color": "#757575"
+                    }
+                ]
+            },
+            {
+                "featureType": "water",
+                "elementType": "geometry",
+                "stylers": [
+                    {
+                        "color": "#000000"
+                    }
+                ]
+            },
+            {
+                "featureType": "water",
+                "elementType": "labels.text.fill",
+                "stylers": [
+                    {
+                        "color": "#3d3d3d"
+                    }
+                ]
+            }
+        ]
     });
 
     $(document).keypress(function (e) {
@@ -34,13 +227,13 @@ $(document).ready(() => {
             });
             let currentBounds = map.getBounds();
             let markerPos = marker.getPosition();
-    
+
             // adjust the viewport
             if (!currentBounds.contains(markerPos)) {
                 let newBounds = currentBounds.extend(markerPos);
                 map.fitBounds(newBounds);
             }
-    
+
             google.maps.event.addListener(marker, 'click', ((marker) => {
                 return () => {
                     infowindow.setContent("Event location")
@@ -70,6 +263,7 @@ $(document).ready(() => {
         geocoder.geocode({
             'address': curInput
         }, (res, status) => {
+            console.log(status);
             // append the res to the list showing address
             if (status == "OK") {
 
@@ -84,13 +278,13 @@ $(document).ready(() => {
                 });
                 let currentBounds = map.getBounds();
                 let markerPos = marker.getPosition();
-    
+
                 // adjust the viewport
                 if (!currentBounds.contains(markerPos)) {
                     let newBounds = currentBounds.extend(markerPos);
                     map.fitBounds(newBounds);
                 }
-    
+
                 google.maps.event.addListener(marker, 'click', ((marker) => {
                     return () => {
                         infowindow.setContent(res[0].formatted_address)
@@ -133,7 +327,10 @@ $(document).ready(() => {
     }
 
     function markOnMap() {
-
+        // remove previous cluster markers
+        for (let i = 0; i < clusterMarkers.length; i++) {
+            clusterMarkers[i].setMap(null);
+        }
         // now plot the bus stops
         for (let i = 0; i < clusters.length; i++) {
             let cur = clusters[i];
@@ -143,13 +340,14 @@ $(document).ready(() => {
                 setLabel: "Bus stop",
                 map: map
             });
-
+            clusterMarkers.push(marker);
             google.maps.event.addListener(marker, 'click', ((marker, i) => {
                 return () => {
                     infowindow.setContent("Bus stop")
                     infowindow.open(map, marker);
                 }
             })(marker, i));
+
         }
     }
 });
